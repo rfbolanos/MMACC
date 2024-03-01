@@ -8,11 +8,16 @@ date: "2024-02-27"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Problema
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+El conjunto de datos taller1.txt contiene la información del perfíl genómico de un
+conjunto de 1200 líneas celulares. Para estas se busca determinar cuáles de los 5000 genes (ubicados en
+cada columna) son de relevancia para la predicción de la variable respuesta (efectividad del tratamiento
+anticancer, medida como variable continua).
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Dataset
+
+XXXXXXXXXX
 
 ```{r}
 library(readr)
@@ -23,12 +28,41 @@ taller1 <- read_csv("C:/taller1.txt")
 summary(taller1)
 ```
 
-## Including Plots
+## Pregunta \# 1
 
-You can also embed plots, for example:
+¿Hay multicolinealidad en los datos? Explique sucintamente
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+## Pregunta \# 2
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos partes:
+Entrenamiento: 1000 líneas celulares
+Prueba: 200 líneas celulares.
+
+## Pregunta \# 3
+
+Usando los 1000 datos de entrenamiento, determine los valores de λr y λl de regesión ridge
+y lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación
+externa. Utilice el método de validación externa que considere más apropiado
+
+## Pregunta \# 4
+
+Ajuste la regresi´on ridge y lasso con los valores estimados de λr y λl obtenidos en (3) usando
+los 1000 datos de entrenamiento.
+
+## Pregunta \# 5
+
+Para los modelos ajustados en (4) determine el m´as apropiado para prop´ositos de predicci´on.
+Considere ´unicamente el ECM en los 200 datos de prueba para su decisi´on.
+
+## Pregunta \# 6
+
+Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto ya tiene un
+λ estimado y un modelo seleccionado.
+
+## Pregunta \# 7
+
+Grafique las trazas de los coeficientes en funci´on de la penalizaci´on para el modelo ajustado en8
+
+## Pregunta \# 8
+
+En un p´arrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
