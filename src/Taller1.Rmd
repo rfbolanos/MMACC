@@ -16,9 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(pacman)
 
-p_load(tidyverse,kableExtra,glmnet,data.table,car)
+p_load(tidyverse,kableExtra,glmnet,data.table,car,pracma)
 
-datos<-fread("taller1.txt",sep="auto")
+taller1<-fread("taller1.txt",sep="auto")
 
 
 ```
@@ -33,14 +33,14 @@ tratamiento anticancer, medida como variable continua).
 
 ## Dataset
 
+
+
+
 ```{r, echo=FALSE, warning=FALSE}
 
-head(datos) %>% data.frame() %>% select(y,V1,V2,V3,V4,V5,V4995,V4996,V4997,V4998,V4999,V5000) %>% 
+head(taller1) %>% data.frame() %>% select(y,V1,V2,V3,V4,V5,V4995,V4996,V4997,V4998,V4999,V5000) %>% 
 knitr::kable(booktabs = FALSE,align="c") %>%
 kable_styling(position = "center")
-
-
-
 
 
 ```
@@ -49,9 +49,12 @@ kable_styling(position = "center")
 
 ¿Hay multicolinealidad en los datos? Explique sucintamente
 
-Dado que la matriz de diseño es de dimensión $n\leq p$, puede existir al
-menos una variable regresora que es producto de una combinación lineal
-de otras variables regresoras.
+Dado que la matriz de diseño es de dimensión $n\leq p$ usar tecnicas como el VIF no es posible y 
+calcular las correlaciones entre las covariables no es necesariamente un sintoma de multicolinealidad, por lo que 
+la existencia de esta misma puede ocurrir por la relación implicita que existe por la naturaleza de las variables. 
+Sin embargo como uno de los principios de la existencia multicolinealidad es que las variables regresoras no sean 
+ortogonales, es posible que exista al menos una variable regresora que es producto de una combinación lineal
+de otras variables regresoras, en ese sentido la existencia de la multicolinealidad es latente en el conjunto de datos. 
 
 ## Pregunta \# 2
 
@@ -88,105 +91,115 @@ validación externa que considere más apropiado
 
 ### Regresión Rigde
 
+Usando la validación cruzada en fold scomo validación externa, se evaluaran 20 lambdas espaciados en escala
+logaritmica en 10 folds y encontrar el mejor lambda para la regresión *Ridge* y *Lasso*. 
+
+
 ```{r}
-# Crear matrix con valores lambda
-log_lambda <- seq(6, -2, length=100) # In reverse
-lambda_matrix <- 10^log_lambda
+
+lambda<-logseq(0.05, 1, 25)
+
 
 # Create 100 ridge models
-ridge_models <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=lambda_matrix)
+ridge_models <- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
+                          alpha=0, 
+                          #lambda=lambda,
+                          nfolds=10)
 
 # Get coefficients of all 100 models
 ridge_coef <- coef(ridge_models)
 
 # Display coefficients for 6 models.
 # Ridge Models are displayed in decreasing order of lambda.
-round(ridge_coef[, c(1:3, 98:100)], 6)
+#round(ridge_coef[, c(1:3, 98:100)], 6)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Find SSE
-SSE_train <- colSums((train_pred_ridge - taller1_1000$y)^2)
-SSE_valid <- colSums((valid_pred_ridge - taller1_200$y)^2)
+# SSE_train <- colSums((train_pred_ridge - taller1_1000$y)^2)
+# SSE_valid <- colSums((valid_pred_ridge - taller1_200$y)^2)
+# 
+# SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
+# SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
+# 
+# 
+# # Find r-Squared
+# r2_train_list <- 1 - SSE_train / SST_train
+# r2_valid_list <- 1 - SSE_valid / SST_valid
 
-SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
-SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
-
-
-# Find r-Squared
-r2_train_list <- 1 - SSE_train / SST_train
-r2_valid_list <- 1 - SSE_valid / SST_valid
-
-round(r2_valid_list[c(1:3, 98:100)],4)
+#round(r2_valid_list[c(1:3, 98:100)],4)
 ```
 
 ```{r}
-plot(log_lambda, r2_train_list, ylim=c(-0.2,1), pch=".", col="salmon", 
-     xlab="ln(lambda)", ylab="r-Squared", main="Training and Validation Scores (Ridge)")
-
-lines(log_lambda, r2_train_list, col="salmon", lwd=2)
-
-lines(log_lambda, r2_valid_list, col="cornflowerblue", lwd=2)
-
-legend(75, 1, legend=c("Training Acc", "Validation Acc"),
-       col=c("salmon", "cornflowerblue"), lty=1, lwd=2, cex=0.8)
+# plot(log_lambda, r2_train_list, ylim=c(-0.2,1), pch=".", col="salmon", 
+#      xlab="ln(lambda)", ylab="r-Squared", main="Training and Validation Scores (Ridge)")
+# 
+# lines(log_lambda, r2_train_list, col="salmon", lwd=2)
+# 
+# lines(log_lambda, r2_valid_list, col="cornflowerblue", lwd=2)
+# 
+# legend(75, 1, legend=c("Training Acc", "Validation Acc"),
+#        col=c("salmon", "cornflowerblue"), lty=1, lwd=2, cex=0.8)
 ```
 
 ```{r}
-best_valid_r2 <- max(r2_valid_list)
-best_valid_r2_ix <- which.max(r2_valid_list)
-best_log_lambda <- log_lambda[best_valid_r2_ix]
-
-cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
-    'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
-    'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
+# best_valid_r2 <- max(r2_valid_list)
+# best_valid_r2_ix <- which.max(r2_valid_list)
+# best_log_lambda <- log_lambda[best_valid_r2_ix]
+# 
+# cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
+#     'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
+#     'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
 ```
 
 ### Regresión Lasso
 
 ```{r}
-# Create 100 LASSO models
-lasso_models <- glmnet(taller1_1000[, -1], taller1_1000$y, alpha=1, lambda=lambda_matrix)
-
-# Get coefficients of all 100 models
-lasso_coef <- coef(lasso_models)
-
-# Display coefficients for 6 models. 
-# LASSO Models are displayed in decreasing order of lambda.
-round(lasso_coef[, c(1:3, 98:100)], 6)
+# # Create 100 LASSO models
+# lasso_models <- glmnet(taller1_1000[, -1], taller1_1000$y, alpha=1, lambda=lambda_matrix)
+# 
+# # Get coefficients of all 100 models
+# lasso_coef <- coef(lasso_models)
+# 
+# # Display coefficients for 6 models. 
+# # LASSO Models are displayed in decreasing order of lambda.
+# round(lasso_coef[, c(1:3, 98:100)], 6)
 ```
 
 ```{r}
-train_pred_lasso <- predict(lasso_models, as.matrix(taller1_1000[, -1]))
-valid_pred_lasso <- predict(lasso_models, as.matrix(taller1_200[, -1]))
-
-valid_pred_lasso[,c(1,2,99,100)]
+#train_pred_lasso <- predict(lasso_models, as.matrix(taller1_1000[, -1]))
+# valid_pred_lasso <- predict(lasso_models, as.matrix(taller1_200[, -1]))
+# 
+# valid_pred_lasso[,c(1,2,99,100)]
 ```
+
+
+
 
 ```{r}
 # Find SSE
-SSE_train <- colSums((train_pred_lasso - taller1_1000$y)^2)
-SSE_valid <- colSums((valid_pred_lasso - taller1_200$y)^2)
-
-
-SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
-SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
+# SSE_train <- colSums((train_pred_lasso - taller1_1000$y)^2)
+# SSE_valid <- colSums((valid_pred_lasso - taller1_200$y)^2)
+# 
+# 
+# SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
+# SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
 
 # Find r-Squared
-r2_train_list <- 1 - SSE_train / SST_train
-r2_valid_list <- 1 - SSE_valid / SST_valid
+# r2_train_list <- 1 - SSE_train / SST_train
+# r2_valid_list <- 1 - SSE_valid / SST_valid
 
-round(r2_valid_list[c(1:3, 98:100)],4)
+# round(r2_valid_list[c(1:3, 98:100)],4)
 ```
 
 ```{r}
-best_valid_r2 <- max(r2_valid_list)
-best_valid_r2_ix <- which.max(r2_valid_list)
-best_log_lambda <- log_lambda[best_valid_r2_ix]
-
-cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
-    'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
-    'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
+# best_valid_r2 <- max(r2_valid_list)
+# best_valid_r2_ix <- which.max(r2_valid_list)
+# best_log_lambda <- log_lambda[best_valid_r2_ix]
+# 
+# cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
+#     'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
+#     'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
 ```
 
 ## Pregunta \# 4
