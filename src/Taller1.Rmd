@@ -6,7 +6,22 @@ date: "2024-02-27"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
+
+```{r paquetes_configuracion,include=FALSE, echo=FALSE}
+
+library(pacman)
+
+p_load(tidyverse,kableExtra,glmnet,data.table,car)
+
+datos<-fread("taller1.txt",sep="auto")
+
+
+```
+
+
+
 
 ## Problema
 
@@ -17,20 +32,29 @@ anticancer, medida como variable continua).
 
 ## Dataset
 
-XXXXXXXXXX
 
-```{r}
-library(readr)
-taller1 <- read_csv("C:/taller1.txt")
+
+
+```{r, echo=FALSE, warning=FALSE}
+
+head(datos) %>% data.frame() %>% select(y,V1,V2,V3,V4,V5,V4995,V4996,V4997,V4998,V4999,V5000) %>% 
+knitr::kable(booktabs = FALSE,align="c") %>%
+kable_styling(position = "center")
+
+
+
+
+
 ```
 
-```{r}
-summary(taller1)
-```
 
 ## Pregunta \# 1
 
 ¿Hay multicolinealidad en los datos? Explique sucintamente
+
+
+Dado que la matriz de diseño es de dimensión $n\leq p$, puede existir al menos una variable regresora que es producto de una combinación lineal de otras variables regresoras.   
+
 
 ## Pregunta \# 2
 
