@@ -2,6 +2,9 @@
 title: "Taller1"
 output: html_document
 date: "2024-02-27"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -20,20 +23,15 @@ datos<-fread("taller1.txt",sep="auto")
 
 ```
 
-
-
-
 ## Problema
 
-El conjunto de datos taller1.txt contiene la información del perfíl genómico de un
-conjunto de 1200 líneas celulares. Para estas se busca determinar cuáles de los 5000 genes (ubicados en
-cada columna) son de relevancia para la predicción de la variable respuesta (efectividad del tratamiento
-anticancer, medida como variable continua).
+El conjunto de datos taller1.txt contiene la información del perfíl
+genómico de un conjunto de 1200 líneas celulares. Para estas se busca
+determinar cuáles de los 5000 genes (ubicados en cada columna) son de
+relevancia para la predicción de la variable respuesta (efectividad del
+tratamiento anticancer, medida como variable continua).
 
 ## Dataset
-
-
-
 
 ```{r, echo=FALSE, warning=FALSE}
 
@@ -47,46 +45,69 @@ kable_styling(position = "center")
 
 ```
 
-
 ## Pregunta \# 1
 
 ¿Hay multicolinealidad en los datos? Explique sucintamente
 
-
-Dado que la matriz de diseño es de dimensión $n\leq p$, puede existir al menos una variable regresora que es producto de una combinación lineal de otras variables regresoras.   
-
+Dado que la matriz de diseño es de dimensión $n\leq p$, puede existir al
+menos una variable regresora que es producto de una combinación lineal
+de otras variables regresoras.
 
 ## Pregunta \# 2
 
-Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos partes:
-Entrenamiento: 1000 líneas celulares
-Prueba: 200 líneas celulares.
+Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en
+dos partes: Entrenamiento: 1000 líneas celulares Prueba: 200 líneas
+celulares.
+
+```{r}
+# Establecer la semilla para reproducibilidad
+set.seed(123)
+
+# Crear un vector de índices de filas
+indices <- 1:1200
+
+# Seleccionar aleatoriamente 1000 índices para el primer conjunto
+indices_1000 <- sample(indices, 1000)
+
+# Crear el primer conjunto de datos con 1000 filas
+taller1_1000 <- taller1[indices_1000, ]
+
+# Remover los índices seleccionados para el primer conjunto
+indices <- setdiff(indices, indices_1000)
+
+# Los índices restantes serán utilizados para el segundo conjunto de datos
+taller1_200 <- taller1[indices, ]
+```
 
 ## Pregunta \# 3
 
-Usando los 1000 datos de entrenamiento, determine los valores de λr y λl de regesión ridge
-y lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación
-externa. Utilice el método de validación externa que considere más apropiado
+Usando los 1000 datos de entrenamiento, determine los valores de λr y λl
+de regesión ridge y lasso, respectivamente, que minimicen el error
+cuadrático medio (ECM) mediante validación externa. Utilice el método de
+validación externa que considere más apropiado
 
 ## Pregunta \# 4
 
-Ajuste la regresi´on ridge y lasso con los valores estimados de λr y λl obtenidos en (3) usando
-los 1000 datos de entrenamiento.
+Ajuste la regresi´on ridge y lasso con los valores estimados de λr y λl
+obtenidos en (3) usando los 1000 datos de entrenamiento.
 
 ## Pregunta \# 5
 
-Para los modelos ajustados en (4) determine el m´as apropiado para prop´ositos de predicci´on.
-Considere ´unicamente el ECM en los 200 datos de prueba para su decisi´on.
+Para los modelos ajustados en (4) determine el m´as apropiado para
+prop´ositos de predicci´on. Considere ´unicamente el ECM en los 200
+datos de prueba para su decisi´on.
 
 ## Pregunta \# 6
 
-Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto ya tiene un
-λ estimado y un modelo seleccionado.
+Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en
+este punto ya tiene un λ estimado y un modelo seleccionado.
 
 ## Pregunta \# 7
 
-Grafique las trazas de los coeficientes en funci´on de la penalizaci´on para el modelo ajustado en8
+Grafique las trazas de los coeficientes en funci´on de la penalizaci´on
+para el modelo ajustado en8
 
 ## Pregunta \# 8
 
-En un p´arrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
+En un p´arrafo resuma los resultados obtenidos dado el objetivo inicial
+del estudio.
