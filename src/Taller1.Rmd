@@ -1,5 +1,6 @@
 ---
-title: "Taller1"
+title: "MMACC- Análisis Avanzado de Datos:  Taller1"
+author: Raúl Andres Rodriguez - Richard Felipe BOlaños
 output: html_document
 date: "2024-02-27"
 editor_options: 
@@ -33,9 +34,6 @@ tratamiento anticancer, medida como variable continua).
 
 ## Dataset
 
-
-
-
 ```{r, echo=FALSE, warning=FALSE}
 
 head(taller1) %>% data.frame() %>% select(y,V1,V2,V3,V4,V5,V4995,V4996,V4997,V4998,V4999,V5000) %>% 
@@ -49,12 +47,16 @@ kable_styling(position = "center")
 
 ¿Hay multicolinealidad en los datos? Explique sucintamente
 
-Dado que la matriz de diseño es de dimensión $n\leq p$ usar tecnicas como el VIF no es posible y 
-calcular las correlaciones entre las covariables no es necesariamente un sintoma de multicolinealidad, por lo que 
-la existencia de esta misma puede ocurrir por la relación implicita que existe por la naturaleza de las variables. 
-Sin embargo como uno de los principios de la existencia multicolinealidad es que las variables regresoras no sean 
-ortogonales, es posible que exista al menos una variable regresora que es producto de una combinación lineal
-de otras variables regresoras, en ese sentido la existencia de la multicolinealidad es latente en el conjunto de datos. 
+Dado que la matriz de diseño es de dimensión $n\leq p$ usar tecnicas
+como el VIF no es posible y calcular las correlaciones entre las
+covariables no es necesariamente un sintoma de multicolinealidad, por lo
+que la existencia de esta misma puede ocurrir por la relación implicita
+que existe por la naturaleza de las variables. Sin embargo como uno de
+los principios de la existencia multicolinealidad es que las variables
+regresoras no sean ortogonales, es posible que exista al menos una
+variable regresora que es producto de una combinación lineal de otras
+variables regresoras, en ese sentido la existencia de la
+multicolinealidad es latente en el conjunto de datos.
 
 ## Pregunta \# 2
 
@@ -84,15 +86,15 @@ taller1_200 <- taller1[indices, ]
 
 ## Pregunta \# 3
 
-Usando los 1000 datos de entrenamiento, determine los valores de $\lambda_R$ y $\lambda_L$
-de regesión ridge y lasso, respectivamente, que minimicen el error
-cuadrático medio (ECM) mediante validación externa. Utilice el método de
-validación externa que considere más apropiado
+Usando los 1000 datos de entrenamiento, determine los valores de
+$\lambda_R$ y $\lambda_L$ de regesión ridge y lasso, respectivamente,
+que minimicen el error cuadrático medio (ECM) mediante validación
+externa. Utilice el método de validación externa que considere más
+apropiado
 
-
-Usando la validación cruzada en fold como validación externa, se evaluaran 20 lambdas espaciados en escala
-logaritmica en 10 folds y encontrar el mejor lambda para la regresión *Ridge* y *Lasso*. 
-
+Usando la validación cruzada en fold como validación externa, se
+evaluaran 20 lambdas espaciados en escala logaritmica en 10 folds y
+encontrar el mejor lambda para la regresión *Ridge* y *Lasso*.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -123,17 +125,16 @@ data.frame(Lambdas= c("Min","1se"),
 
 ```
 
-
 ## Pregunta \# 4
 
-Ajuste la regresi´on ridge y lasso con los valores estimados de λr y λl
+Ajuste la regresión ridge y lasso con los valores estimados de λr y λl
 obtenidos en (3) usando los 1000 datos de entrenamiento.
 
 ## Pregunta \# 5
 
-Para los modelos ajustados en (4) determine el m´as apropiado para
-prop´ositos de predicci´on. Considere ´unicamente el ECM en los 200
-datos de prueba para su decisi´on.
+Para los modelos ajustados en (4) determine el más apropiado para
+prop´ositos de predicción. Considere únicamente el ECM en los 200 datos
+de prueba para su decisión.
 
 ## Pregunta \# 6
 
@@ -142,10 +143,10 @@ este punto ya tiene un λ estimado y un modelo seleccionado.
 
 ## Pregunta \# 7
 
-Grafique las trazas de los coeficientes en funci´on de la penalizaci´on
-para el modelo ajustado en8
+Grafique las trazas de los coeficientes en función de la penalización
+para el modelo ajustado en 6
 
 ## Pregunta \# 8
 
-En un p´arrafo resuma los resultados obtenidos dado el objetivo inicial
+En un párrafo resuma los resultados obtenidos dado el objetivo inicial
 del estudio.
