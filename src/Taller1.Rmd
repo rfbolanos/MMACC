@@ -130,10 +130,24 @@ data.frame(Lambdas= c("Min","1se"),
 Ajuste la regresión ridge y lasso con los valores estimados de λr y λl
 obtenidos en (3) usando los 1000 datos de entrenamiento.
 
+```{r message=FALSE, warning=FALSE}
+
+#RIDGE
+ridge_model_min <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.min)
+
+ridge_model_1se <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.1se)
+
+
+#LASSO
+lasso_model_min <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda.min)
+
+lasso_model_1se <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda1se)
+```
+
 ## Pregunta \# 5
 
 Para los modelos ajustados en (4) determine el más apropiado para
-prop´ositos de predicción. Considere únicamente el ECM en los 200 datos
+propósitos de predicción. Considere únicamente el ECM en los 200 datos
 de prueba para su decisión.
 
 ## Pregunta \# 6
