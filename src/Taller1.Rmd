@@ -84,123 +84,45 @@ taller1_200 <- taller1[indices, ]
 
 ## Pregunta \# 3
 
-Usando los 1000 datos de entrenamiento, determine los valores de λr y λl
+Usando los 1000 datos de entrenamiento, determine los valores de $\lambda_R$ y $\lambda_L$
 de regesión ridge y lasso, respectivamente, que minimicen el error
 cuadrático medio (ECM) mediante validación externa. Utilice el método de
 validación externa que considere más apropiado
 
-### Regresión Rigde
 
-Usando la validación cruzada en fold scomo validación externa, se evaluaran 20 lambdas espaciados en escala
+Usando la validación cruzada en fold como validación externa, se evaluaran 20 lambdas espaciados en escala
 logaritmica en 10 folds y encontrar el mejor lambda para la regresión *Ridge* y *Lasso*. 
 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 lambda<-logseq(0.05, 1, 25)
 
 
-# Create 100 ridge models
+## RIDGE
+
 ridge_models <- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
                           alpha=0, 
-                          #lambda=lambda,
+                          lambda=lambda,
                           nfolds=10)
 
-# Get coefficients of all 100 models
-ridge_coef <- coef(ridge_models)
-
-# Display coefficients for 6 models.
-# Ridge Models are displayed in decreasing order of lambda.
-#round(ridge_coef[, c(1:3, 98:100)], 6)
+## LASSO
+lasso_models <- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
+                          alpha=1, 
+                          lambda=lambda,
+                          nfolds=10)
 ```
 
-```{r eval=FALSE, include=FALSE}
-# Find SSE
-# SSE_train <- colSums((train_pred_ridge - taller1_1000$y)^2)
-# SSE_valid <- colSums((valid_pred_ridge - taller1_200$y)^2)
-# 
-# SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
-# SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
-# 
-# 
-# # Find r-Squared
-# r2_train_list <- 1 - SSE_train / SST_train
-# r2_valid_list <- 1 - SSE_valid / SST_valid
+```{r echo=FALSE, warning=FALSE}
 
-#round(r2_valid_list[c(1:3, 98:100)],4)
+data.frame(Lambdas= c("Min","1se"),
+           Ridge=c(ridge_models$lambda.min,ridge_models$lambda.1se),
+           Lasso=c(lasso_models$lambda.min,lasso_models$lambda.1se)) %>% 
+  knitr::kable(booktabs = FALSE,align="c") %>% kable_styling(position = "center")
+
+
 ```
 
-```{r}
-# plot(log_lambda, r2_train_list, ylim=c(-0.2,1), pch=".", col="salmon", 
-#      xlab="ln(lambda)", ylab="r-Squared", main="Training and Validation Scores (Ridge)")
-# 
-# lines(log_lambda, r2_train_list, col="salmon", lwd=2)
-# 
-# lines(log_lambda, r2_valid_list, col="cornflowerblue", lwd=2)
-# 
-# legend(75, 1, legend=c("Training Acc", "Validation Acc"),
-#        col=c("salmon", "cornflowerblue"), lty=1, lwd=2, cex=0.8)
-```
-
-```{r}
-# best_valid_r2 <- max(r2_valid_list)
-# best_valid_r2_ix <- which.max(r2_valid_list)
-# best_log_lambda <- log_lambda[best_valid_r2_ix]
-# 
-# cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
-#     'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
-#     'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
-```
-
-### Regresión Lasso
-
-```{r}
-# # Create 100 LASSO models
-# lasso_models <- glmnet(taller1_1000[, -1], taller1_1000$y, alpha=1, lambda=lambda_matrix)
-# 
-# # Get coefficients of all 100 models
-# lasso_coef <- coef(lasso_models)
-# 
-# # Display coefficients for 6 models. 
-# # LASSO Models are displayed in decreasing order of lambda.
-# round(lasso_coef[, c(1:3, 98:100)], 6)
-```
-
-```{r}
-#train_pred_lasso <- predict(lasso_models, as.matrix(taller1_1000[, -1]))
-# valid_pred_lasso <- predict(lasso_models, as.matrix(taller1_200[, -1]))
-# 
-# valid_pred_lasso[,c(1,2,99,100)]
-```
-
-
-
-
-```{r}
-# Find SSE
-# SSE_train <- colSums((train_pred_lasso - taller1_1000$y)^2)
-# SSE_valid <- colSums((valid_pred_lasso - taller1_200$y)^2)
-# 
-# 
-# SST_train <- SSE_train + colSums((train_pred_ridge - mean(taller1_1000$y))^2)
-# SST_valid <- SSE_valid + colSums((valid_pred_ridge - mean(taller1_200$y))^2)
-
-# Find r-Squared
-# r2_train_list <- 1 - SSE_train / SST_train
-# r2_valid_list <- 1 - SSE_valid / SST_valid
-
-# round(r2_valid_list[c(1:3, 98:100)],4)
-```
-
-```{r}
-# best_valid_r2 <- max(r2_valid_list)
-# best_valid_r2_ix <- which.max(r2_valid_list)
-# best_log_lambda <- log_lambda[best_valid_r2_ix]
-# 
-# cat('Index of Optimal r-Squared:    ', best_valid_r2_ix, '\n',
-#     'Value of Optimal r-Squared:    ', best_valid_r2, '\n',
-#     'Value of Optimal log(lambda):  ', best_log_lambda, sep='')
-```
 
 ## Pregunta \# 4
 
