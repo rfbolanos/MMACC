@@ -9,6 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Raúl Andrés Rodriguez - Richard Felipe Bolaños" />
 
 <meta name="date" content="2024-02-27" />
 
@@ -522,17 +523,23 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+content: "";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "\e258";
-font-family: 'Glyphicons Halflings';
+content: "";
 border: none;
+}
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "";
+font-family: 'Glyphicons Halflings';
+display: inline-block;
+padding: 10px;
+border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -575,6 +582,7 @@ display: none;
 
 <h1 class="title toc-ignore">MMACC- Análisis Avanzado de Datos:
 Taller1</h1>
+<h4 class="author">Raúl Andrés Rodriguez - Richard Felipe Bolaños</h4>
 <h4 class="date">2024-02-27</h4>
 
 </div>
@@ -590,7 +598,7 @@ tratamiento anticancer, medida como variable continua).</p>
 </div>
 <div id="dataset" class="section level2">
 <h2>Dataset</h2>
-<table class="table" style="margin-left: auto; margin-right: auto;">
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:center;">
@@ -926,7 +934,7 @@ lasso_models &lt;- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
                           alpha=1, 
                           lambda=lambda,
                           nfolds=10)</code></pre>
-<table class="table" style="margin-left: auto; margin-right: auto;">
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:center;">
@@ -968,14 +976,127 @@ Min
 </div>
 <div id="pregunta-4" class="section level2">
 <h2>Pregunta # 4</h2>
-<p>Ajuste la regresión ridge y lasso con los valores estimados de λr y
-λl obtenidos en (3) usando los 1000 datos de entrenamiento.</p>
+<p>Ajuste la regresión ridge y lasso con los valores estimados de <span class="math inline">\(\lambda_R\)</span> y <span class="math inline">\(\lambda_L\)</span> obtenidos en (3) usando los
+1000 datos de entrenamiento.</p>
+<pre class="r"><code>#RIDGE
+ridge_model_min &lt;- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.min)
+
+ridge_model_1se &lt;- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.1se)
+
+
+#LASSO
+lasso_model_min &lt;- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda.min)
+
+lasso_model_1se &lt;- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda1se)</code></pre>
 </div>
 <div id="pregunta-5" class="section level2">
 <h2>Pregunta # 5</h2>
 <p>Para los modelos ajustados en (4) determine el más apropiado para
-prop´ositos de predicción. Considere únicamente el ECM en los 200 datos
+propósitos de predicción. Considere únicamente el ECM en los 200 datos
 de prueba para su decisión.</p>
+<pre class="r"><code>#No. 1 
+# Realizar predicciones en los datos de prueba
+predicciones_rmin &lt;- predict(ridge_model_min, as.matrix(taller1_200[, -1]))
+
+# Calcular el error cuadrático medio
+ecm_ridge_min &lt;- mean((predicciones_rmin - taller1_200$y)^2)
+
+#No. 2 
+# Realizar predicciones en los datos de prueba
+predicciones_rse1 &lt;- predict(ridge_model_1se, as.matrix(taller1_200[, -1]))
+
+# Calcular el error cuadrático medio
+ecm_ridge_1se &lt;- mean((predicciones_rse1 - taller1_200$y)^2)
+
+#No. 3 
+# Realizar predicciones en los datos de prueba
+predicciones_lmin &lt;- predict(lasso_model_min, as.matrix(taller1_200[, -1]))
+
+# Calcular el error cuadrático medio
+ecm_lasso_min &lt;- mean((predicciones_lmin - taller1_200$y)^2)
+
+#No. 4 
+# Realizar predicciones en los datos de prueba
+predicciones_lse1 &lt;- predict(lasso_model_1se, as.matrix(taller1_200[, -1]))
+
+# Calcular el error cuadrático medio
+ecm_lasso_1se &lt;- mean((predicciones_lse1 - taller1_200$y)^2)</code></pre>
+<table class="table" style="color: black; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:center;">
+Modelos
+</th>
+<th style="text-align:center;">
+Lambdas
+</th>
+<th style="text-align:center;">
+Value
+</th>
+<th style="text-align:center;">
+ECM
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+Ridge
+</td>
+<td style="text-align:center;">
+Min
+</td>
+<td style="text-align:center;">
+0.7790778
+</td>
+<td style="text-align:center;">
+14.7098329728379
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+Ridge
+</td>
+<td style="text-align:center;">
+Se1
+</td>
+<td style="text-align:center;">
+1.0000000
+</td>
+<td style="text-align:center;">
+14.6753282954373
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+Lasso
+</td>
+<td style="text-align:center;">
+Min
+</td>
+<td style="text-align:center;">
+0.0727108
+</td>
+<td style="text-align:center;">
+<span style=" font-weight: bold;    color: green !important;">1.24847946260254</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+Lasso
+</td>
+<td style="text-align:center;">
+Se1
+</td>
+<td style="text-align:center;">
+0.1057371
+</td>
+<td style="text-align:center;">
+3.90411605780588
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="pregunta-6" class="section level2">
 <h2>Pregunta # 6</h2>

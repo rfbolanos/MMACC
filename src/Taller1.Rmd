@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(pacman)
 
-p_load(tidyverse,kableExtra,glmnet,data.table,car,pracma)
+p_load(tidyverse,kableExtra,glmnet,data.table,car,pracma,knitr)
 
 taller1<-fread("taller1.txt",sep="auto")
 
@@ -87,7 +87,7 @@ taller1_200 <- taller1[indices, ]
 ## Pregunta \# 3
 
 Usando los 1000 datos de entrenamiento, determine los valores de
-$\lambda_R$ y $\lambda_L$ de regesión ridge y lasso, respectivamente,
+$\lambda_r$ y $\lambda_l$ de regesión ridge y lasso, respectivamente,
 que minimicen el error cuadrático medio (ECM) mediante validación
 externa. Utilice el método de validación externa que considere más
 apropiado
@@ -127,7 +127,7 @@ data.frame(Lambdas= c("Min","1se"),
 
 ## Pregunta \# 4
 
-Ajuste la regresión ridge y lasso con los valores estimados de λr y λl
+Ajuste la regresión ridge y lasso con los valores estimados de $\lambda_r$ y $\lambda_l$
 obtenidos en (3) usando los 1000 datos de entrenamiento.
 
 ```{r message=FALSE, warning=FALSE}
@@ -150,7 +150,7 @@ Para los modelos ajustados en (4) determine el más apropiado para
 propósitos de predicción. Considere únicamente el ECM en los 200 datos
 de prueba para su decisión.
 
-```{r message=FALSE, warning=FALSE}}
+```{r message=FALSE, warning=FALSE}
 
 #No. 1 
 # Realizar predicciones en los datos de prueba
@@ -181,30 +181,49 @@ predicciones_lse1 <- predict(lasso_model_1se, as.matrix(taller1_200[, -1]))
 ecm_lasso_1se <- mean((predicciones_lse1 - taller1_200$y)^2)
 
 
-
-data.frame(Modelos=rep(c("Ridge","Lasso"),each= 2),Lambdas=c("Min","Se1"),
-           Value=c(ridge_models$lambda.min,ridge_models$lambda.1se,
-                   lasso_models$lambda.min,lasso_models$lambda.1se),
-           ECM= c(ecm_ridge_min, ecm_ridge_1se,ecm_lasso_min, ecm_lasso_1se)) %>% 
-  knitr::kable(booktabs = FALSE,align="c") %>% kable_styling(position = "center")
-  
-
-
-
-
-
-
 ```
 
+```{r echo=FALSE}
+
+df<-data.frame(Modelos=rep(c("Ridge","Lasso"),each= 2),Lambdas=c("Min","Se1"),
+           Value=c(ridge_models$lambda.min,ridge_models$lambda.1se,
+                   lasso_models$lambda.min,lasso_models$lambda.1se),
+           ECM= c(ecm_ridge_min, ecm_ridge_1se,ecm_lasso_min, ecm_lasso_1se))  
+
+df[3,4]<- cell_spec(df[3,4], bold = T, color = "green" )
+ 
+ knitr::kable(df,format = "html",align="c",escape=FALSE,
+              format.args = list(decimal.mark = ".") )%>% kable_styling(position = "center") 
+  
+```
+
+En ese sentido l modelo que tuvo menor error cuadratico medio es el modelo lasso con el $\lambda_{min}$. 
+
+  
 ## Pregunta \# 6
 
 Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en
-este punto ya tiene un λ estimado y un modelo seleccionado.
+este punto ya tiene un $\lambda$ y un modelo seleccionado.
+
+```{r}
+
+Modelo<-glmnet(y=taller1_200$y,x= taller1_200[,-1],alpha = 1,lambda =lasso_models$lambda.min )
+
+```
+
 
 ## Pregunta \# 7
 
 Grafique las trazas de los coeficientes en función de la penalización
 para el modelo ajustado en 6
+
+```{r}
+
+plot(Modelo, label = TRUE)
+
+
+```
+
 
 ## Pregunta \# 8
 
