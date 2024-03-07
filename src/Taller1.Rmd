@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(pacman)
 
-p_load(tidyverse,kableExtra,glmnet,data.table,car,pracma,knitr)
+p_load(tidyverse,kableExtra,glmnet,data.table,car,pracma,knitr,ISLR2)
 
 taller1<-fread("taller1.txt",sep="auto")
 
@@ -103,13 +103,13 @@ lambda<-logseq(0.05, 1, 25)
 
 ## RIDGE
 
-ridge_models <- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
+ridge_models <- cv.glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y,
                           alpha=0, 
                           lambda=lambda,
                           nfolds=10)
 
 ## LASSO
-lasso_models <- cv.glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y,
+lasso_models <- cv.glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y,
                           alpha=1, 
                           lambda=lambda,
                           nfolds=10)
@@ -133,15 +133,19 @@ obtenidos en (3) usando los 1000 datos de entrenamiento.
 ```{r message=FALSE, warning=FALSE}
 
 #RIDGE
-ridge_model_min <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.min)
+ridge_model_min <- glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y,
+                          alpha=0, lambda=ridge_models$lambda.min)
 
-ridge_model_1se <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=0, lambda=ridge_models$lambda.1se)
+ridge_model_1se <- glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y,
+                          alpha=0, lambda=ridge_models$lambda.1se)
 
 
 #LASSO
-lasso_model_min <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda.min)
+lasso_model_min <- glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y,
+                          alpha=1, lambda=lasso_models$lambda.min)
 
-lasso_model_1se <- glmnet(as.matrix(taller1_1000[, -1]), taller1_1000$y, alpha=1, lambda=lasso_models$lambda1se)
+lasso_model_1se <- glmnet(x=as.matrix(taller1_1000[, -1]), y=taller1_1000$y, 
+                          alpha=1, lambda=lasso_models$lambda.1se)
 ```
 
 ## Pregunta \# 5
@@ -185,19 +189,19 @@ ecm_lasso_1se <- mean((predicciones_lse1 - taller1_200$y)^2)
 
 ```{r echo=FALSE}
 
-df<-data.frame(Modelos=rep(c("Ridge","Lasso"),each= 2),Lambdas=c("Min","Se1"),
+df<-data.frame(Modelos=rep(c("Ridge","Lasso"),each= 2),Lambdas=c("Min","1Se"),
            Value=c(ridge_models$lambda.min,ridge_models$lambda.1se,
                    lasso_models$lambda.min,lasso_models$lambda.1se),
            ECM= c(ecm_ridge_min, ecm_ridge_1se,ecm_lasso_min, ecm_lasso_1se))  
 
-df[3,4]<- cell_spec(df[3,4], bold = T, color = "green" )
+df[4,4]<- cell_spec(df[4,4], bold = T, color = "green" )
  
  knitr::kable(df,format = "html",align="c",escape=FALSE,
               format.args = list(decimal.mark = ".") )%>% kable_styling(position = "center") 
   
 ```
 
-En ese sentido l modelo que tuvo menor error cuadratico medio es el modelo lasso con el $\lambda_{min}$. 
+En ese sentido l modelo que tuvo menor error cuadratico medio es el modelo lasso con el $\lambda_{min}$, Sin embargo a se sugiere utilizar el $\lambda_{1se}$ por que penaliza mas variables que el $\lambda_{min}$.
 
   
 ## Pregunta \# 6
@@ -205,9 +209,15 @@ En ese sentido l modelo que tuvo menor error cuadratico medio es el modelo lasso
 Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en
 este punto ya tiene un $\lambda$ y un modelo seleccionado.
 
+
+Se realizan dos modelos uno con el lambda ajustado para fines de la predicción y otro modelo para realizar el grafico de las trazas.
+
 ```{r}
 
-Modelo<-glmnet(y=taller1_200$y,x= taller1_200[,-1],alpha = 1,lambda =lasso_models$lambda.min )
+Modelo.fit<-glmnet(y=as.matrix(taller1[,1]),x= as.matrix(taller1[,-1]),alpha = 1,lambda=0.10573713)
+
+Modelo<-glmnet(y=as.matrix(taller1[,1]),x= as.matrix(taller1[,-1]),alpha = 1,lambda=lambda)
+
 
 ```
 
@@ -219,11 +229,11 @@ para el modelo ajustado en 6
 
 ```{r}
 
-plot(Modelo, label = TRUE)
+plot(Modelo, label = TRUE,xvar = "lambda",
+     main="Trazas de los coeficcientes vs Log(Lambdas)")
 
 
 ```
-
 
 ## Pregunta \# 8
 
