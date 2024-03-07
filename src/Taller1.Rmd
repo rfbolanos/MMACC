@@ -127,8 +127,9 @@ data.frame(Lambdas= c("Min","1se"),
 
 ## Pregunta \# 4
 
-Ajuste la regresión ridge y lasso con los valores estimados de $\lambda_r$ y $\lambda_l$
-obtenidos en (3) usando los 1000 datos de entrenamiento.
+Ajuste la regresión ridge y lasso con los valores estimados de
+$\lambda_r$ y $\lambda_l$ obtenidos en (3) usando los 1000 datos de
+entrenamiento.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -201,16 +202,17 @@ df[4,4]<- cell_spec(df[4,4], bold = T, color = "green" )
   
 ```
 
-En ese sentido l modelo que tuvo menor error cuadratico medio es el modelo lasso con el $\lambda_{min}$, Sin embargo a se sugiere utilizar el $\lambda_{1se}$ por que penaliza mas variables que el $\lambda_{min}$.
+En ese sentido el modelo que tuvo menor error cuadratico medio es el
+modelo lasso con el $\lambda_{min}$, Sin embargo se sugiere utilizar el
+$\lambda_{1se}$ por qué penaliza más variables que el $\lambda_{min}$.
 
-  
 ## Pregunta \# 6
 
 Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en
 este punto ya tiene un $\lambda$ y un modelo seleccionado.
 
-
-Se realizan dos modelos uno con el lambda ajustado para fines de la predicción y otro modelo para realizar el grafico de las trazas.
+Se realizan dos modelos uno con el lambda ajustado para fines de la
+predicción y otro modelo para realizar el grafico de las trazas.
 
 ```{r}
 
@@ -220,7 +222,6 @@ Modelo<-glmnet(y=as.matrix(taller1[,1]),x= as.matrix(taller1[,-1]),alpha = 1,lam
 
 
 ```
-
 
 ## Pregunta \# 7
 
@@ -239,3 +240,24 @@ plot(Modelo, label = TRUE,xvar = "lambda",
 
 En un párrafo resuma los resultados obtenidos dado el objetivo inicial
 del estudio.
+
+Dado el conjunto de datos que contiene la información del perfil
+genómico de 1200 líneas celulares y buscando determinar cuáles
+covariables son de relevancia para la predicción de la variable
+respuesta definida como la efectividad del tratamiento anticáncer, se
+realizó un ejercicio que en primer lugar determinó la multicolinealidad
+del conjunto de datos dado que cuenta con un mayor número de columnas
+frente a las observaciones, lo cual se explica detalladamente en el
+punto 1. Seguidamente se realizó la validación de modelos de regresión
+Ridge y Lasso para determinar el modelo más adecuado utilizando el ECM
+como variable de selección y el nivel de penalización.
+
+El resultado corresponde a un modelo de regresión Lasso, el cual a
+través del análisis de los coeficientes nos permite determinar las
+variables menos relevantes para la predicción las cuales tienen un
+coeficiente con valor cero. Este análisis de los coeficientes del modelo
+Lasso permite no solo identificar los genes más importantes para la
+predicción, sino también reducir el número de variables a considerar en
+futuros análisis, lo que simplifica el modelo y posiblemente mejora su
+interpretabilidad y generalización, cumpliendo así con el objetivo
+propuesto.
